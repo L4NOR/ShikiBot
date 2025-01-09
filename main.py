@@ -192,6 +192,14 @@ async def announce_new_chapter(ctx, chapter_number: str, chapter_link: str, *, d
     reactions = ["🔥", "👀", "❤️"]
     for reaction in reactions:
         await announcement.add_reaction(reaction)
+
+    # Créer un thread pour la discussion dans la catégorie spécifiée
+    category = ctx.guild.get_channel(1326230010608226364)
+    if category:
+        thread = await announcement.create_thread(
+            name=f"Tougen Anki - Discussion Chapitre {chapter_number}",
+            auto_archive_duration=1440  # Archive après 24h d'inactivité
+    )
     
     # Supprimer la commande originale
     await ctx.message.delete()
