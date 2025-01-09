@@ -1,4 +1,4 @@
-import discord 
+import discord
 from discord.ext import commands
 import os
 from dotenv import load_dotenv
@@ -25,7 +25,7 @@ app.router.add_get('/', handle_health_check)
 
 # Fonction pour lancer le serveur web
 async def start_webserver():
-    port = int(os.getenv('PORT', 8080))  # Utilise le port depuis les variables d'environnement ou 8080 par défaut
+    port = int(os.getenv('PORT', 8080))
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', port)
@@ -37,8 +37,33 @@ async def start_webserver():
 async def on_ready():
     print(f'Bot connecté en tant que {bot.user.name}')
     await bot.change_presence(activity=discord.Game(name="Lire Tougen Anki"))
-    # Démarrer le serveur web
     await start_webserver()
+
+# Événement pour la mise à jour des rôles
+@bot.event
+async def on_member_update(before, after):
+    # ID du rôle à surveiller
+    role_id = 1326778962143215677
+    # ID du canal pour les messages
+    channel_id = 1326229582273314937
+    
+    # Obtenir le canal
+    channel = bot.get_channel(channel_id)
+    if not channel:
+        return
+    
+    # Vérifier si le rôle a été ajouté
+    role = after.guild.get_role(role_id)
+    if not role:
+        return
+        
+    # Si le rôle a été ajouté
+    if role not in before.roles and role in after.roles:
+        await channel.send(f"Bienvenue dans la communauté de {role.name} <@{after.id}> ! 🎉")
+    
+    # Si le rôle a été retiré
+    elif role in before.roles and role not in after.roles:
+        await channel.send(f"Au revoir {after.name}, vous avez quitté la communauté de {role.name} 👋")
 
 # Lancer le bot avec asyncio
 async def main():
