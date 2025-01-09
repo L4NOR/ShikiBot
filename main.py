@@ -15,6 +15,9 @@ intents.members = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+# Supprimer la commande help par défaut
+bot.remove_command('help')
+
 # Configuration du serveur web
 app = web.Application()
 
@@ -65,7 +68,47 @@ async def on_member_update(before, after):
     elif role in before.roles and role not in after.roles:
         await channel.send(f"Au revoir {after.name}, vous avez quitté la communauté de {role.name} 👋")
 
-        # Commande pour annoncer un nouveau chapitre
+# Commande Shiki (aide)
+@bot.command(name='Shiki')
+async def help_command(ctx):
+    embed = discord.Embed(
+        title="🌸 Guide du Bot Tougen Anki 🌸",
+        description="Voici la liste des commandes disponibles :",
+        color=0xFF1493  # Rose profond
+    )
+    
+    # Section pour les commandes administrateur
+    embed.add_field(
+        name="👑 Commandes Administrateur",
+        value="""
+        `!newchapter_tougenanki <numéro> <lien> [description]`
+        Annonce un nouveau chapitre de Tougen Anki
+        • `numéro` : Numéro du chapitre
+        • `lien` : Lien vers le chapitre
+        • `description` : Description optionnelle
+        """,
+        inline=False
+    )
+    
+    # Section informative
+    embed.add_field(
+        name="ℹ️ À propos",
+        value="""
+        Ce bot gère automatiquement :
+        • Les messages de bienvenue pour les nouveaux membres
+        • Les notifications de nouveaux chapitres
+        • Le suivi des rôles de la communauté
+        
+        Rejoignez-nous dans cette aventure entre Momo et Oni ! 🍑👹
+        """,
+        inline=False
+    )
+    
+    embed.set_footer(text="Pour plus d'informations, contactez un administrateur | Bot Tougen Anki")
+    
+    await ctx.send(embed=embed)
+
+# Commande pour annoncer un nouveau chapitre
 @bot.command(name='newchapter_tougenanki')
 @commands.has_permissions(administrator=True)
 async def announce_new_chapter(ctx, chapter_number: str, chapter_link: str, *, description: str = None):
