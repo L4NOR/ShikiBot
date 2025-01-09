@@ -65,6 +65,94 @@ async def on_member_update(before, after):
     elif role in before.roles and role not in after.roles:
         await channel.send(f"Au revoir {after.name}, vous avez quitté la communauté de {role.name} 👋")
 
+        # Commande pour annoncer un nouveau chapitre
+@bot.command(name='newchapter_tougenanki')
+@commands.has_permissions(administrator=True)
+async def announce_new_chapter(ctx, chapter_number: str, chapter_link: str, *, description: str = None):
+    if ctx.channel.id != 1326213946188890142:
+        await ctx.send("Cette commande ne peut être utilisée que dans le canal d'annonces approprié.")
+        return
+
+    role_id = 1326778962143215677
+    role = ctx.guild.get_role(role_id)
+    
+    if not role:
+        await ctx.send("Le rôle spécifié n'a pas été trouvé.")
+        return
+
+    # Créer l'embed avec un design amélioré
+    embed = discord.Embed(
+        title="🔥 NOUVEAU CHAPITRE DE TOUGEN ANKI 🔥",
+        description=(
+            "Un nouveau chapitre vient d'arriver ! Préparez-vous à plonger dans de nouvelles "
+            "aventures palpitantes avec Shiki Ichinose et son envie d'un monde de paix entre Momo et Oni !\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━"
+        ),
+        color=0x1E90FF  # Bleu royal
+    )
+    
+    # Informations sur le chapitre
+    embed.add_field(
+        name="📖 Chapitre",
+        value=f"**#{chapter_number}**",
+        inline=True
+    )
+    
+    embed.add_field(
+        name="⏰ Disponible",
+        value="**MAINTENANT !**",
+        inline=True
+    )
+    
+    # Lien de lecture
+    embed.add_field(
+        name="📚 Lien de lecture",
+        value=f"[Cliquez ici pour lire le chapitre !]({chapter_link})",
+        inline=False
+    )
+    
+    # Séparateur
+    embed.add_field(
+        name="━━━━━━━━━━━━━━━━━━━━━━━━",
+        value="",
+        inline=False
+    )
+    
+    # Description si fournie
+    if description:
+        embed.add_field(
+            name="📝 Aperçu",
+            value=f"*{description}*",
+            inline=False
+        )
+    
+    # Note de bas de page
+    embed.set_footer(
+        text=(
+            "N'oubliez pas de partager vos théories et réactions sur twitter et discord ! "
+            "Bonne lecture à tous ! 🎉"
+        )
+    )
+    
+    # Petit rappel en haut du message
+    reminder_text = (
+        f"{role.mention}\n"
+        "───────────────────────\n"
+        "**Un nouveau chapitre vient d'être publié !**\n"
+        "Retrouvez tous les détails ci-dessous ⬇️"
+    )
+
+    # Envoyer l'annonce
+    announcement = await ctx.send(reminder_text, embed=embed)
+    
+    # Ajouter plusieurs réactions
+    reactions = ["🔥", "👀", "❤️"]
+    for reaction in reactions:
+        await announcement.add_reaction(reaction)
+    
+    # Supprimer la commande originale
+    await ctx.message.delete()
+
 # Lancer le bot avec asyncio
 async def main():
     async with bot:
