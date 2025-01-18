@@ -47,26 +47,34 @@ async def on_ready():
 async def on_member_update(before, after):
     # ID du rôle à surveiller
     role_id = 1326778962143215677
-    # ID du canal pour les messages
-    channel_id = 1326229582273314937
+    # ID du fil pour les messages
+    thread_id = 1330144191816142941
     
-    # Obtenir le canal
-    channel = bot.get_channel(channel_id)
-    if not channel:
-        return
-    
-    # Vérifier si le rôle a été ajouté
-    role = after.guild.get_role(role_id)
-    if not role:
-        return
+    try:
+        # Obtenir le fil (thread)
+        thread = await bot.fetch_channel(thread_id)
+        if not thread:
+            print(f"Fil {thread_id} non trouvé")
+            return
         
-    # Si le rôle a été ajouté
-    if role not in before.roles and role in after.roles:
-        await channel.send(f"Bienvenue dans la communauté de {role.name} <@{after.id}> ! 🎉")
-    
-    # Si le rôle a été retiré
-    elif role in before.roles and role not in after.roles:
-        await channel.send(f"Au revoir {after.name}, vous avez quitté la communauté de {role.name} 👋")
+        # Vérifier si le rôle a été ajouté
+        role = after.guild.get_role(role_id)
+        if not role:
+            print(f"Rôle {role_id} non trouvé")
+            return
+            
+        # Si le rôle a été ajouté
+        if role not in before.roles and role in after.roles:
+            await thread.send(f"Bienvenue dans la communauté de {role.name} <@{after.id}> ! 🎉")
+            print(f"Rôle ajouté pour {after.name}")
+        
+        # Si le rôle a été retiré
+        elif role in before.roles and role not in after.roles:
+            await thread.send(f"Au revoir {after.name}, vous avez quitté la communauté de {role.name} 👋")
+            print(f"Rôle retiré pour {after.name}")
+            
+    except Exception as e:
+        print(f"Erreur lors de l'envoi du message : {str(e)}")
 
 # Commande Shiki (aide)
 @bot.command(name='Shiki')
