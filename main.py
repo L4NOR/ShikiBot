@@ -77,7 +77,6 @@ async def on_member_update(before, after):
         print(f"Erreur lors de l'envoi du message : {str(e)}")
 
 # Commande Shiki (aide)
-# Commande Yomi (aide)
 @bot.command(name='Shiki')
 async def help_command(ctx):
     embed = discord.Embed(
@@ -86,7 +85,7 @@ async def help_command(ctx):
             "Bienvenue dans l'univers de Tougen Anki ! \n"
             "🤖 Votre assistant de communauté dédié aux fans du manga"
         ),
-        color=0x800080  # Bleu exorciste
+        color=0xFF1493  # Bleu exorciste
     )
 
     # Commandes administrateur avec icônes et formatage amélioré
