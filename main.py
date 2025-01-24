@@ -77,43 +77,58 @@ async def on_member_update(before, after):
         print(f"Erreur lors de l'envoi du message : {str(e)}")
 
 # Commande Shiki (aide)
+# Commande Yomi (aide)
 @bot.command(name='Shiki')
 async def help_command(ctx):
     embed = discord.Embed(
-        title="🌸 Guide du Bot Tougen Anki 🌸",
-        description="Voici la liste des commandes disponibles :",
-        color=0xFF1493  # Rose profond
+        title="🔥 Guide du Bot Tougen Anki 🔥",
+        description=(
+            "Bienvenue dans l'univers de Tougen Anki ! \n"
+            "🤖 Votre assistant de communauté dédié aux fans du manga"
+        ),
+        color=0x800080  # Bleu exorciste
     )
-    
-    # Section pour les commandes administrateur
+
+    # Commandes administrateur avec icônes et formatage amélioré
     embed.add_field(
         name="👑 Commandes Administrateur",
-        value="""
-        `!newchapter_tougenanki <numéro> <lien> [description]`
-        Annonce un nouveau chapitre de Tougen Anki
-        • `numéro` : Numéro du chapitre
-        • `lien` : Lien vers le chapitre
-        • `description` : Description optionnelle
-        """,
+        value=(
+            "!newchapter_tougenanki\n"
+            "• 📘 Annonce un nouveau chapitre\n"
+            "• 🔢 Paramètres : <numéro> <lien> [description]\n"
+            "• 💡 Exemple : !newchapter_tougenanki 1 https://exemple.com"
+        ),
         inline=False
     )
-    
-    # Section informative
+
+    # Section informative avec plus de détails
     embed.add_field(
-        name="ℹ️ À propos",
-        value="""
-        Ce bot gère automatiquement :
-        • Les messages de bienvenue pour les nouveaux membres
-        • Les notifications de nouveaux chapitres
-        • Le suivi des rôles de la communauté
-        
-        Rejoignez-nous dans cette aventure entre Momo et Oni ! 🍑👹
-        """,
+        name="🌟 Fonctionnalités du Bot",
+        value=(
+            "• 👋 Gestion des messages de bienvenue dans l'univers de Tougen Anki\n"
+            "• 📣 Notifications de nouveaux chapitres\n"
+            "• 🏷️ Suivi automatique des rôles\n"
+            "• 🔔 Alertes communautaires"
+        ),
         inline=False
     )
-    
-    embed.set_footer(text="Pour plus d'informations, contactez un administrateur | Bot Tougen Anki")
-    
+
+    # Nouveaux détails interactifs
+    embed.add_field(
+        name="🎉 Interaction Communautaire",
+        value=(
+            "• Réactions automatiques aux annonces\n"
+            "• Création de threads de discussion\n"
+            "• Mentions de rôles personnalisées"
+        ),
+        inline=False
+    )
+
+    embed.set_footer(
+        text="Un problème ? Contactez les administrateurs | Powered by Tougen Anki Bot 🍑👹",
+        icon_url=""  # Remplacez par une URL d'icône valide
+    )
+
     await ctx.send(embed=embed)
 
 # Commande pour annoncer un nouveau chapitre
