@@ -131,6 +131,57 @@ async def help_command(ctx):
     await ctx.send(embed=embed)
 
 # Commande pour annoncer un nouveau chapitre
+async def create_chapter_announcement(ctx, chapter_number, chapter_link, description=None):
+    role_id = 1326778962143215677
+    role = ctx.guild.get_role(role_id)
+    
+    if not role:
+        await ctx.send("Le rôle spécifié n'a pas été trouvé.")
+        return None
+
+    embed = discord.Embed(
+        title="🔥 NOUVEAU CHAPITRE DE TOUGEN ANKI 🔥",
+        description=(
+            "Un nouveau chapitre vient d'arriver ! Préparez-vous à plonger dans de nouvelles "
+            "aventures palpitantes avec Shiki Ichinose et son envie d'un monde de paix entre Momo et Oni !\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━"
+        ),
+        color=0x1E90FF
+    )
+    
+    embed.add_field(name="📖 Chapitre", value=f"**#{chapter_number}**", inline=True)
+    embed.add_field(name="⏰ Disponible", value="**MAINTENANT !**", inline=True)
+    embed.add_field(name="📚 Lien de lecture", value=f"[Cliquez ici pour lire le chapitre !]({chapter_link})", inline=False)
+    embed.add_field(name="━━━━━━━━━━━━━━━━━━━━━━━━", value="", inline=False)
+    
+    if description:
+        embed.add_field(name="📝 Aperçu", value=f"*{description}*", inline=False)
+    
+    embed.set_footer(text="N'oubliez pas de partager vos théories et réactions sur twitter et discord ! Bonne lecture à tous ! 🎉")
+    
+    reminder_text = (
+        f"{role.mention}\n"
+        "───────────────────────\n"
+        "**Un nouveau chapitre vient d'être publié !**\n"
+        "Retrouvez tous les détails ci-dessous ⬇️"
+    )
+
+    announcement = await ctx.send(reminder_text, embed=embed)
+    
+    reactions = ["🔥", "👀", "❤️"]
+    for reaction in reactions:
+        await announcement.add_reaction(reaction)
+
+    category = ctx.guild.get_channel(1326230010608226364)
+    if category:
+        thread = await announcement.create_thread(
+            name=f"Tougen Anki - Discussion Chapitre {chapter_number}",
+            auto_archive_duration=1440
+        )
+    
+    return announcement
+
+# Commande pour annoncer un seul chapitre [inchangée]
 @bot.command(name='newchapter_tougenanki')
 @commands.has_permissions(administrator=True)
 async def announce_new_chapter(ctx, chapter_number: str, chapter_link: str, *, description: str = None):
@@ -145,86 +196,42 @@ async def announce_new_chapter(ctx, chapter_number: str, chapter_link: str, *, d
         await ctx.send("Le rôle spécifié n'a pas été trouvé.")
         return
 
-    # Créer l'embed avec un design amélioré
-    embed = discord.Embed(
-        title="🔥 NOUVEAU CHAPITRE DE TOUGEN ANKI 🔥",
-        description=(
-            "Un nouveau chapitre vient d'arriver ! Préparez-vous à plonger dans de nouvelles "
-            "aventures palpitantes avec Shiki Ichinose et son envie d'un monde de paix entre Momo et Oni !\n\n"
-            "━━━━━━━━━━━━━━━━━━━━━━━━"
-        ),
-        color=0x1E90FF  # Bleu royal
-    )
-    
-    # Informations sur le chapitre
-    embed.add_field(
-        name="📖 Chapitre",
-        value=f"**#{chapter_number}**",
-        inline=True
-    )
-    
-    embed.add_field(
-        name="⏰ Disponible",
-        value="**MAINTENANT !**",
-        inline=True
-    )
-    
-    # Lien de lecture
-    embed.add_field(
-        name="📚 Lien de lecture",
-        value=f"[Cliquez ici pour lire le chapitre !]({chapter_link})",
-        inline=False
-    )
-    
-    # Séparateur
-    embed.add_field(
-        name="━━━━━━━━━━━━━━━━━━━━━━━━",
-        value="",
-        inline=False
-    )
-    
-    # Description si fournie
-    if description:
-        embed.add_field(
-            name="📝 Aperçu",
-            value=f"*{description}*",
-            inline=False
-        )
-    
-    # Note de bas de page
-    embed.set_footer(
-        text=(
-            "N'oubliez pas de partager vos théories et réactions sur twitter et discord ! "
-            "Bonne lecture à tous ! 🎉"
-        )
-    )
-    
-    # Petit rappel en haut du message
-    reminder_text = (
-        f"{role.mention}\n"
-        "───────────────────────\n"
-        "**Un nouveau chapitre vient d'être publié !**\n"
-        "Retrouvez tous les détails ci-dessous ⬇️"
-    )
-
-    # Envoyer l'annonce
-    announcement = await ctx.send(reminder_text, embed=embed)
-    
-    # Ajouter plusieurs réactions
-    reactions = ["🔥", "👀", "❤️"]
-    for reaction in reactions:
-        await announcement.add_reaction(reaction)
-
-    # Créer un thread pour la discussion dans la catégorie spécifiée
-    category = ctx.guild.get_channel(1326230010608226364)
-    if category:
-        thread = await announcement.create_thread(
-            name=f"Tougen Anki - Discussion Chapitre {chapter_number}",
-            auto_archive_duration=1440  # Archive après 24h d'inactivité
-    )
-    
-    # Supprimer la commande originale
+    await create_chapter_announcement(ctx, chapter_number, chapter_link, description)
     await ctx.message.delete()
+
+# Nouvelle commande pour annoncer plusieurs chapitres
+@bot.command(name='newchapters_tougenanki')
+@commands.has_permissions(administrator=True)
+async def announce_multiple_chapters(ctx, *, chapters_data: str):
+    if ctx.channel.id != 1326213946188890142:
+        await ctx.send("Cette commande ne peut être utilisée que dans le canal d'annonces approprié.")
+        return
+
+    try:
+        # Séparer les différents chapitres (délimités par ;)
+        chapters = chapters_data.split(';')
+        
+        for chapter in chapters:
+            # Séparer les informations du chapitre (délimitées par ,)
+            try:
+                chapter_info = chapter.strip().split(',')
+                if len(chapter_info) >= 2:
+                    number = chapter_info[0].strip()
+                    link = chapter_info[1].strip()
+                    description = chapter_info[2].strip() if len(chapter_info) > 2 else None
+                    
+                    await create_chapter_announcement(ctx, number, link, description)
+                    # Petit délai entre chaque annonce pour éviter les problèmes de rate limit
+                    await asyncio.sleep(2)
+                    
+            except Exception as e:
+                await ctx.send(f"Erreur lors de l'annonce du chapitre {chapter}: {str(e)}")
+                continue
+                
+        await ctx.message.delete()
+        
+    except Exception as e:
+        await ctx.send(f"Erreur lors du traitement des chapitres: {str(e)}")
 
 # Lancer le bot avec asyncio
 async def main():
