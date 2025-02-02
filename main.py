@@ -185,7 +185,7 @@ async def create_chapter_announcement(ctx, chapter_number, chapter_link, descrip
 @bot.command(name='newchapter_tougenanki')
 @commands.has_permissions(administrator=True)
 async def announce_new_chapter(ctx, chapter_number: str, chapter_link: str, *, description: str = None):
-    if ctx.channel.id != 1326213946188890142:
+    if ctx.channel.id != 1326176233410658385:
         await ctx.send("Cette commande ne peut être utilisée que dans le canal d'annonces approprié.")
         return
 
