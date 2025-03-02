@@ -94,8 +94,8 @@ async def help_command(ctx):
         value=(
             "!newchapter_tougenanki\n"
             "• 📘 Annonce un nouveau chapitre\n"
-            "• 🔢 Paramètres : <numéro> <lien> [description]\n"
-            "• 💡 Exemple : !newchapter_tougenanki 1 https://exemple.com"
+            "• 🔢 Paramètres : <numéros_chapitres> <lien> [description]\n"
+            "• 💡 Exemple : !newchapter_tougenanki 187 188 https://exemple.com"
         ),
         inline=False
     )
@@ -130,14 +130,46 @@ async def help_command(ctx):
 
     await ctx.send(embed=embed)
 
-# Commande pour annoncer un nouveau chapitre
+# Commande pour annoncer un nouveau chapitre (modifiée pour accepter plusieurs chapitres)
 @bot.command(name='newchapter_tougenanki')
 @commands.has_permissions(administrator=True)
-async def announce_new_chapter(ctx, chapter_number: str, chapter_link: str, *, description: str = None):
+async def announce_new_chapter(ctx, *args):
     if ctx.channel.id != 1326213946188890142:
         await ctx.send("Cette commande ne peut être utilisée que dans le canal d'annonces approprié.")
         return
-
+    
+    # Vérifier qu'il y a au moins 2 arguments (au moins un numéro de chapitre et un lien)
+    if len(args) < 2:
+        await ctx.send("Syntaxe incorrecte. Utilisez `!newchapter_tougenanki <numéros_chapitres> <lien> [description]`")
+        return
+    
+    # Trouver où se termine la liste des chapitres et où commence le lien
+    chapter_numbers = []
+    link_index = 0
+    
+    for i, arg in enumerate(args):
+        # Si l'argument ressemble à un URL (commence par http), c'est notre lien
+        if arg.startswith("http"):
+            link_index = i
+            break
+        # Sinon, c'est un numéro de chapitre
+        chapter_numbers.append(arg)
+    
+    # Si aucun lien n'a été trouvé
+    if link_index == 0:
+        await ctx.send("Lien manquant. Utilisez `!newchapter_tougenanki <numéros_chapitres> <lien> [description]`")
+        return
+    
+    chapter_link = args[link_index]
+    
+    # Récupérer la description si elle existe (tout ce qui vient après le lien)
+    description = None
+    if link_index + 1 < len(args):
+        description = " ".join(args[link_index + 1:])
+    
+    # Formater les numéros de chapitres pour l'affichage
+    chapters_display = ", ".join(chapter_numbers)
+    
     role_id = 1326778962143215677
     role = ctx.guild.get_role(role_id)
     
@@ -147,9 +179,9 @@ async def announce_new_chapter(ctx, chapter_number: str, chapter_link: str, *, d
 
     # Créer l'embed avec un design amélioré
     embed = discord.Embed(
-        title="🔥 NOUVEAU CHAPITRE DE TOUGEN ANKI 🔥",
+        title="🔥 NOUVEAU(X) CHAPITRE(S) DE TOUGEN ANKI 🔥",
         description=(
-            "Un nouveau chapitre vient d'arriver ! Préparez-vous à plonger dans de nouvelles "
+            "De nouveaux chapitres viennent d'arriver ! Préparez-vous à plonger dans de nouvelles "
             "aventures palpitantes avec Shiki Ichinose et son envie d'un monde de paix entre Momo et Oni !\n\n"
             "━━━━━━━━━━━━━━━━━━━━━━━━"
         ),
@@ -158,8 +190,8 @@ async def announce_new_chapter(ctx, chapter_number: str, chapter_link: str, *, d
     
     # Informations sur le chapitre
     embed.add_field(
-        name="📖 Chapitre",
-        value=f"**#{chapter_number}**",
+        name="📖 Chapitre(s)",
+        value=f"**#{chapters_display}**",
         inline=True
     )
     
@@ -172,7 +204,7 @@ async def announce_new_chapter(ctx, chapter_number: str, chapter_link: str, *, d
     # Lien de lecture
     embed.add_field(
         name="📚 Lien de lecture",
-        value=f"[Cliquez ici pour lire le chapitre !]({chapter_link})",
+        value=f"[Cliquez ici pour lire le(s) chapitre(s) !]({chapter_link})",
         inline=False
     )
     
@@ -203,7 +235,7 @@ async def announce_new_chapter(ctx, chapter_number: str, chapter_link: str, *, d
     reminder_text = (
         f"{role.mention}\n"
         "───────────────────────\n"
-        "**Un nouveau chapitre vient d'être publié !**\n"
+        "**De nouveaux chapitres viennent d'être publiés !**\n"
         "Retrouvez tous les détails ci-dessous ⬇️"
     )
 
@@ -218,10 +250,11 @@ async def announce_new_chapter(ctx, chapter_number: str, chapter_link: str, *, d
     # Créer un thread pour la discussion dans la catégorie spécifiée
     category = ctx.guild.get_channel(1326230010608226364)
     if category:
+        thread_name = f"Tougen Anki - Discussion Chapitre(s) {chapters_display}"
         thread = await announcement.create_thread(
-            name=f"Tougen Anki - Discussion Chapitre {chapter_number}",
+            name=thread_name,
             auto_archive_duration=1440  # Archive après 24h d'inactivité
-    )
+        )
     
     # Supprimer la commande originale
     await ctx.message.delete()
