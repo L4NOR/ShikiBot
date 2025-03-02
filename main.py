@@ -134,7 +134,7 @@ async def help_command(ctx):
 @bot.command(name='newchapter_tougenanki')
 @commands.has_permissions(administrator=True)
 async def announce_new_chapter(ctx, *args):
-    if ctx.channel.id != 1326176233410658385:
+    if ctx.channel.id != 1326213946188890142:
         await ctx.send("Cette commande ne peut être utilisée que dans le canal d'annonces approprié.")
         return
     
