@@ -16,18 +16,6 @@ def setup_commands(bot):
             color=PINK_COLOR
         )
 
-        # Commandes administrateur avec icônes et formatage amélioré
-        embed.add_field(
-            name="👑 Commandes Administrateur",
-            value=(
-                "!newchapter_tougenanki\n"
-                "• 📘 Annonce un nouveau chapitre\n"
-                "• 🔢 Paramètres : <numéros_chapitres> <lien> [description]\n"
-                "• 💡 Exemple : !newchapter_tougenanki 187 188 https://exemple.com"
-            ),
-            inline=False
-        )
-
         # Section informative avec plus de détails
         embed.add_field(
             name="🌟 Fonctionnalités du Bot",
@@ -45,7 +33,6 @@ def setup_commands(bot):
             name="🎉 Interaction Communautaire",
             value=(
                 "• Réactions automatiques aux annonces\n"
-                "• Création de threads de discussion\n"
                 "• Mentions de rôles personnalisées"
             ),
             inline=False
