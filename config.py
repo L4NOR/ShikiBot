@@ -8,7 +8,7 @@ load_dotenv()
 # Configuration du bot
 BOT_TOKEN = os.getenv('TOKEN')
 PORT = int(os.getenv('PORT', 8080))
-COMMAND_PREFIX = '!'
+COMMAND_PREFIX = '!s'
 
 # ID des rôles et canaux
 ROLE_TOUGEN_ANKI_ID = 1326778962143215677
