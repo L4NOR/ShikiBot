@@ -1,6 +1,41 @@
 import discord
 import re
-from config import ROLE_TOUGEN_ANKI_ID, WELCOME_THREAD_ID
+import tweepy  # Assurez-vous que Tweepy est installé
+from config import ROLE_TOUGEN_ANKI_ID, WELCOME_THREAD_ID, TWITTER_API_KEY, TWITTER_API_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_SECRET, TWITTER_TOUGEN_CHANNEL_ID
+import asyncio
+
+class TwitterStream(tweepy.StreamingClient):
+    def __init__(self, bearer_token, bot):
+        super().__init__(bearer_token)
+        self.bot = bot
+
+    def on_tweet(self, tweet):
+        # Filtrer les retweets et les réponses
+        if tweet.referenced_tweets or tweet.text.startswith("RT"):
+            return
+
+        # Construire le message à envoyer sur Discord
+        tweet_url = f"https://twitter.com/{tweet.author_id}/status/{tweet.id}"
+        message = f"📢 Nouveau tweet : {tweet_url}"
+
+        # Envoyer le message sur le canal Discord
+        asyncio.run_coroutine_threadsafe(
+            self.send_to_discord(message), self.bot.loop
+        )
+
+    async def send_to_discord(self, message):
+        channel = self.bot.get_channel(TWITTER_TOUGEN_CHANNEL_ID)
+        if channel:
+            await channel.send(message)
+
+async def start_twitter_stream(bot):
+    try:
+        # Initialiser le flux Twitter
+        stream = TwitterStream(bearer_token=TWITTER_API_KEY, bot=bot)
+        stream.add_rules(tweepy.StreamRule("from:1260150204696686592"))  # Remplacez par l'ID du compte Twitter cible
+        stream.filter()
+    except Exception as e:
+        print(f"Erreur lors du démarrage du flux Twitter : {str(e)}")
 
 async def setup(bot):
     @bot.event
@@ -9,6 +44,9 @@ async def setup(bot):
         await bot.change_presence(activity=discord.Game(name="Lire Tougen Anki"))
         from utils import start_webserver
         await start_webserver(bot)
+
+        # Démarrer le flux Twitter
+        asyncio.create_task(start_twitter_stream(bot))
 
     @bot.event
     async def on_member_update(before, after):
