@@ -181,7 +181,7 @@ def setup_commands(bot):
         embed = discord.Embed(
             title=f"📖 Récapitulatif du Chapitre #{last_chapter_number}",
             description=f"**{last_chapter_title}**",
-            color=ROYAL_BLUE_COLOR
+            color=PINK_COLOR
         )
 
         # Ajouter le résumé
