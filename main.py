@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 import asyncio
 from config import BOT_TOKEN, COMMAND_PREFIX, intents
-from commands import setup_commands, setup_slash_commands
+from commands import setup_commands
 from events import setup
 from utils import app
 
@@ -16,7 +16,6 @@ async def main():
     
     # Configuration des commandes et événements
     setup_commands(bot)  # Commandes avec préfixe s!
-    setup_slash_commands(bot)  # Commandes slash pour affichage sur profil
     await setup(bot)
     
     # Événement on_ready pour synchroniser les commandes slash
