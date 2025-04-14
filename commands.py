@@ -172,3 +172,46 @@ def setup_commands(bot):
         
         # Supprimer la commande originale
         await ctx.message.delete()
+
+    # Commande pour donner une récapitulation du dernier chapitre
+    @bot.command(name='recap')
+    async def recap_command(ctx):
+        # Informations sur le dernier chapitre
+        last_chapter_number = "189"  # Numéro du chapitre
+        last_chapter_title = "Pile de cadavres"  # Titre du chapitre
+        last_chapter_summary = (
+            "La grande bataille commence entre les Momo et les Oni. "
+            "Pour gagner, Shiki et ses alliés doivent découvrir les secrets cachés derrière les artefacts ancestraux. "
+            "Cependant, une trahison inattendue pourrait tout bouleverser..."
+        )  # Résumé du chapitre
+        chapter_link = "https://lanortrad.netlify.app/manga/tougen%20anki/chapitre%20189"  # Lien vers le chapitre
+
+        # Création de l'embed
+        embed = discord.Embed(
+            title=f"📖 Récapitulatif du Chapitre #{last_chapter_number}",
+            description=f"**{last_chapter_title}**",
+            color=ROYAL_BLUE_COLOR
+        )
+
+        # Ajouter le résumé
+        embed.add_field(
+            name="Résumé",
+            value=last_chapter_summary,
+            inline=False
+        )
+
+        # Ajouter le lien vers le chapitre
+        embed.add_field(
+            name="📚 Lien vers le chapitre",
+            value=f"[Cliquez ici pour lire le chapitre]({chapter_link})",
+            inline=False
+        )
+
+        # Ajouter une note de bas de page
+        embed.set_footer(
+            text="Restez connectés pour le prochain chapitre !",
+            icon_url=""  # Ajoutez une URL d'icône si nécessaire
+        )
+
+        # Envoyer l'embed
+        await ctx.send(embed=embed)
