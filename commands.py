@@ -160,15 +160,6 @@ def setup_commands(bot):
         # Ajouter plusieurs réactions
         for reaction in ANNOUNCEMENT_REACTIONS:
             await announcement.add_reaction(reaction)
-
-        # Créer un thread pour la discussion dans la catégorie spécifiée
-        category = ctx.guild.get_channel(DISCUSSIONS_CATEGORY_ID)
-        if category:
-            thread_name = f"Tougen Anki - Discussion Chapitre(s) {chapters_display}"
-            thread = await announcement.create_thread(
-                name=thread_name,
-                auto_archive_duration=THREAD_AUTO_ARCHIVE_DURATION
-            )
         
         # Supprimer la commande originale
         await ctx.message.delete()
