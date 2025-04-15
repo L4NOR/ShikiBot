@@ -2,6 +2,9 @@ import discord
 from discord.ext import commands
 from config import PINK_COLOR, ROYAL_BLUE_COLOR, ROLE_TOUGEN_ANKI_ID, ANNOUNCEMENTS_CHANNEL_ID, ANNOUNCEMENT_REACTIONS
 from config import DISCUSSIONS_CATEGORY_ID, THREAD_AUTO_ARCHIVE_DURATION
+from datetime import datetime
+import re
+from config import WELCOME_THREAD_ID
 
 def setup_commands(bot):
     # Commande Shiki (aide)
@@ -206,3 +209,119 @@ def setup_commands(bot):
 
         # Envoyer l'embed
         await ctx.send(embed=embed)
+
+    @bot.event
+    async def on_message(message):
+        # Vérifier si le message est dans le bon channel
+        if message.channel.id != WELCOME_THREAD_ID:
+            return
+
+        # Ignorer les messages du bot lui-même
+        if message.author.bot and message.author.name != "LanorTrad":
+            return
+
+        # Vérifier si c'est une commande de planification de LanorTrad
+        if message.author.name == "LanorTrad":
+            pattern = r'!planifier "Tougen Anki" (\d+) (\d{2}/\d{2}/\d{4})'
+            match = re.search(pattern, message.content)
+            
+            if match:
+                chapter_number = match.group(1)
+                release_date = match.group(2)
+                
+                try:
+                    # Convertir la date (format: DD/MM/YYYY)
+                    release_datetime = datetime.strptime(release_date, "%d/%m/%Y")
+                    
+                    # Sauvegarder les informations
+                    bot.next_chapter = {
+                        'number': chapter_number,
+                        'release_date': release_datetime,
+                        'channel_id': WELCOME_THREAD_ID  # Sauvegarder l'ID du channel
+                    }
+                    
+                    # Créer l'embed de confirmation
+                    embed = create_timer_embed(chapter_number, release_datetime)
+                    await message.channel.send(embed=embed)
+                    
+                except ValueError as e:
+                    print(f"Erreur lors du traitement de la date : {e}")
+
+        # Traiter les commandes normales du bot
+        await bot.process_commands(message)
+
+    @bot.command(name='timer')
+    async def show_timer(ctx):
+        """Affiche le timer pour le prochain chapitre"""
+        # Vérifier si la commande est utilisée dans le bon channel
+        if ctx.channel.id != WELCOME_THREAD_ID:
+            await ctx.message.delete()
+            return
+            
+        if not hasattr(bot, 'next_chapter'):
+            await ctx.send("❌ Aucun chapitre n'est actuellement planifié.")
+            return
+            
+        chapter_info = bot.next_chapter
+        embed = create_timer_embed(chapter_info['number'], chapter_info['release_date'])
+        await ctx.send(embed=embed)
+
+def create_timer_embed(chapter_number, release_datetime):
+    """Crée l'embed du timer avec les informations données"""
+    now = datetime.now()
+    delta = release_datetime - now
+    
+    embed = discord.Embed(
+        title="⏰ Compte à rebours Tougen Anki",
+        description=f"En attente du chapitre #{chapter_number}",
+        color=ROYAL_BLUE_COLOR
+    )
+    
+    days = delta.days
+    hours = delta.seconds // 3600
+    minutes = (delta.seconds % 3600) // 60
+    
+    # Champs temporels
+    embed.add_field(
+        name="⌛ Temps restant",
+        value=f"**{days}** jours, **{hours}** heures et **{minutes}** minutes",
+        inline=False
+    )
+    
+    # Date de sortie
+    embed.add_field(
+        name="📅 Date de sortie",
+        value=release_datetime.strftime("%d/%m/%Y"),
+        inline=True
+    )
+    
+    # Barre de progression
+    progress = min(100, int((1 - delta.total_seconds() / (7 * 24 * 3600)) * 100))
+    progress_bar = "█" * (progress // 10) + "░" * ((100 - progress) // 10)
+    
+    embed.add_field(
+        name="📊 Progression",
+        value=f"`{progress_bar}` {progress}%",
+        inline=False
+    )
+    
+    # Status dynamique
+    if days > 5:
+        status = "🟢 Prenez votre temps pour relire les anciens chapitres !"
+    elif days > 2:
+        status = "🟡 Préparez-vous, le prochain chapitre arrive bientôt !"
+    else:
+        status = "🔴 Le chapitre est imminent ! Restez à l'affût !"
+        
+    embed.add_field(
+        name="📌 Status",
+        value=status,
+        inline=False
+    )
+    
+    embed.set_footer(
+        text="Utilisez !timer pour voir le temps restant",
+        icon_url=""
+    )
+    
+    return embed

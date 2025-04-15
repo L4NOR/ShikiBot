@@ -30,3 +30,11 @@ ANNOUNCEMENT_REACTIONS = ["🔥", "👀", "❤️"]
 
 # Paramètres pour les threads de discussion
 THREAD_AUTO_ARCHIVE_DURATION = 1440  # 24 heures
+
+# Configuration du timer
+TIMER_UPDATE_INTERVAL = 60 * 60  # Mise à jour toutes les heures
+TIMER_STATUS_COLORS = {
+    'EARLY': 0x00FF00,    # Vert
+    'SOON': 0xFFFF00,     # Jaune
+    'IMMINENT': 0xFF0000  # Rouge
+}
