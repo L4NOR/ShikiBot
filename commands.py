@@ -212,10 +212,6 @@ def setup_commands(bot):
 
     @bot.event
     async def on_message(message):
-        # Vérifier si le message est dans le bon channel
-        if message.channel.id != WELCOME_THREAD_ID:
-            return
-
         # Ignorer les messages du bot lui-même
         if message.author.bot and message.author.name != "LanorTrad":
             return
@@ -236,13 +232,19 @@ def setup_commands(bot):
                     # Sauvegarder les informations
                     bot.next_chapter = {
                         'number': chapter_number,
-                        'release_date': release_datetime,
-                        'channel_id': WELCOME_THREAD_ID  # Sauvegarder l'ID du channel
+                        'release_date': release_datetime
                     }
                     
-                    # Créer l'embed de confirmation
-                    embed = create_timer_embed(chapter_number, release_datetime)
-                    await message.channel.send(embed=embed)
+                    # Obtenir le channel dédié pour le timer
+                    timer_channel = message.guild.get_channel(WELCOME_THREAD_ID)
+                    if timer_channel:
+                        # Créer et envoyer l'embed dans le channel dédié
+                        embed = create_timer_embed(chapter_number, release_datetime)
+                        await timer_channel.send(
+                            "📢 **Nouveau chapitre planifié !**\n"
+                            "━━━━━━━━━━━━━━━━━━━━━━━━",
+                            embed=embed
+                        )
                     
                 except ValueError as e:
                     print(f"Erreur lors du traitement de la date : {e}")
@@ -253,10 +255,8 @@ def setup_commands(bot):
     @bot.command(name='timer')
     async def show_timer(ctx):
         """Affiche le timer pour le prochain chapitre"""
-        # Vérifier si la commande est utilisée dans le bon channel
-        if ctx.channel.id != WELCOME_THREAD_ID:
-            await ctx.message.delete()
-            return
+        # Obtenir le channel dédié
+        timer_channel = ctx.guild.get_channel(WELCOME_THREAD_ID)
             
         if not hasattr(bot, 'next_chapter'):
             await ctx.send("❌ Aucun chapitre n'est actuellement planifié.")
@@ -264,7 +264,22 @@ def setup_commands(bot):
             
         chapter_info = bot.next_chapter
         embed = create_timer_embed(chapter_info['number'], chapter_info['release_date'])
-        await ctx.send(embed=embed)
+        
+        # Si la commande est utilisée dans le mauvais channel
+        if ctx.channel.id != WELCOME_THREAD_ID:
+            # Supprimer la commande
+            await ctx.message.delete()
+            # Envoyer un message temporaire pour rediriger
+            redirect = await ctx.send(
+                f"⚠️ Cette commande doit être utilisée dans <#{WELCOME_THREAD_ID}>",
+                delete_after=5
+            )
+            # Envoyer le timer dans le bon channel
+            if timer_channel:
+                await timer_channel.send(embed=embed)
+        else:
+            # Envoyer directement dans le bon channel
+            await ctx.send(embed=embed)
 
 def create_timer_embed(chapter_number, release_datetime):
     """Crée l'embed du timer avec les informations données"""
