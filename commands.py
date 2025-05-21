@@ -40,7 +40,6 @@ def setup_commands(bot):
 
         embed.set_footer(
             text="Un problème ? Contactez les administrateurs | Powered by Tougen Anki Bot 🍑👹",
-            icon_url=""  # Remplacez par une URL d'icône valide
         )
 
         await ctx.send(embed=embed)
@@ -134,7 +133,7 @@ def setup_commands(bot):
         if description:
             embed.add_field(
                 name="📝 Aperçu",
-                value=f"*{description}*",
+                value=f"{description}",
                 inline=False
             )
         
@@ -168,14 +167,12 @@ def setup_commands(bot):
     @bot.command(name='recap')
     async def recap_command(ctx):
         # Informations sur le dernier chapitre
-        last_chapter_number = "189"  # Numéro du chapitre
-        last_chapter_title = "Pile de cadavres"  # Titre du chapitre
+        last_chapter_number = "193"  # Numéro du chapitre
+        last_chapter_title = "Sentiments"  # Titre du chapitre
         last_chapter_summary = (
-            "La grande bataille commence entre les Momo et les Oni. "
-            "Pour gagner, Shiki et ses alliés doivent découvrir les secrets cachés derrière les artefacts ancestraux. "
-            "Cependant, une trahison inattendue pourrait tout bouleverser..."
+            "Yusurube perd le contrôle et entre en mode berserk après avoir réalisé que sa sœur est réellement morte, brisant l’illusion créée par un lavage de cerveau. Alors qu’il sombre dans la douleur, ses amis tentent de le ramener à la raison en lui rappelant qu’il n’est pas seul et qu’ils sont là pour le soutenir."
         )  # Résumé du chapitre
-        chapter_link = "https://lanortrad.netlify.app/manga/tougen%20anki/chapitre%20189"  # Lien vers le chapitre
+        chapter_link = "https://lanortrad.netlify.app/manga/tougen%20anki/chapitre%20193"  # Lien vers le chapitre
 
         # Création de l'embed
         embed = discord.Embed(
@@ -201,7 +198,6 @@ def setup_commands(bot):
         # Ajouter une note de bas de page
         embed.set_footer(
             text="Restez connectés pour le prochain chapitre !",
-            icon_url=""  # Ajoutez une URL d'icône si nécessaire
         )
 
         # Envoyer l'embed
