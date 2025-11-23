@@ -24,7 +24,7 @@ async def main():
         print(f'Bot connecté en tant que {bot.user.name}')
         # Synchroniser les commandes slash avec Discord
         await bot.tree.sync()
-        await bot.change_presence(activity=discord.Game(name="Lire Tougen Anki"))
+        await bot.change_presence(activity=discord.Game(name="Lire Tougen Anki 😈"))
         from utils import start_webserver
         await start_webserver(bot)
     
