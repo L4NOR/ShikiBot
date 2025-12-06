@@ -31,6 +31,15 @@ ANNOUNCEMENT_REACTIONS = ["🔥", "👀", "❤️"]
 # Paramètres pour les threads de discussion
 THREAD_AUTO_ARCHIVE_DURATION = 1440  # 24 heures
 
+# IDs des rôles de l'équipe de traduction (à remplacer par les vrais IDs)
+ROLE_TRADUCTEUR_ID = 433305136975183882  
+ROLE_CLEANER_ID = 608234789564186644
+ROLE_EDITEUR_ID = 608234789564186644
+ROLE_QCHECK_ID = 937386825562062858
+
+# Cooldown pour les commandes d'incitation (en secondes)
+INCITATION_COOLDOWN = 300  # 5 minutes entre chaque incitation du même type
+
 # Configuration du timer
 TIMER_UPDATE_INTERVAL = 60 * 60  # Mise à jour toutes les heures
 TIMER_STATUS_COLORS = {
